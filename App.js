@@ -6,7 +6,7 @@ import Home from "./screen/Home";
 import Login from "./screen/Login";
 import SplashScreen from "./screen/SplashScreen";
 import * as SecureStore from "expo-secure-store";
-
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 const Stack = createNativeStackNavigator();
 const AuthContext = React.createContext();
 
@@ -81,15 +81,17 @@ export default App = () => {
   }
   return (
     <AuthContext.Provider value={authContext}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          {state.userToken == null ? (
-            <Stack.Screen name="Connexion" component={Login} />
-          ) : (
-            <Stack.Screen name="Accueil" component={Home} />
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <Stack.Navigator>
+            {state.userToken == null ? (
+              <Stack.Screen name="Connexion" component={Login} />
+            ) : (
+              <Stack.Screen name="Accueil" component={Home} />
+            )}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
     </AuthContext.Provider>
   );
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { ActivityIndicator, Image, StyleSheet, View } from "react-native";
 
-const SplashScreen = () => {
+export default SplashScreen = () => {
   return (
     <View style={styles.container}>
       <Image
@@ -13,8 +13,6 @@ const SplashScreen = () => {
     </View>
   );
 };
-
-export default SplashScreen;
 
 const styles = StyleSheet.create({
   container: {

@@ -7,12 +7,26 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../features/auth/authSlice";
+import axios from "axios";
 
 export default Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
   const submit = () => {
-    alert("lol");
+    axios
+      .post("https://dayliz.herokuapp.com/api/auth/login", {
+        email: email,
+        password: password,
+      })
+      .then(function (response) {
+        dispatch(login(response.data.access_token));
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   };
   return (
     <View style={styles.container}>

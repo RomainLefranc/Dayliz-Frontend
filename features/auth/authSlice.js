@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import * as SecureStore from "expo-secure-store";
 
 export const authSlice = createSlice({
   name: "auth",
@@ -8,23 +9,31 @@ export const authSlice = createSlice({
   },
   reducers: {
     login: (state, action) => {
+      async function setToken() {
+        await SecureStore.setItemAsync("access_token", action.payload);
+      }
+      setToken();
       return {
-        ...state,
         token: action.payload,
         isLoading: false,
       };
     },
     logout: (state) => {
+      async function deleteToken() {
+        await SecureStore.deleteItemAsync("access_token");
+      }
+      deleteToken();
       return {
-        ...state,
         token: null,
         isLoading: false,
       };
     },
-    retrieveToken: (state, action) => {
+    retrieveToken: (state) => {
+      async function getToken() {
+        return await SecureStore.getItemAsync("access_token");
+      }
       return {
-        ...state,
-        token: action.payload,
+        token: getToken(),
         isLoading: false,
       };
     },

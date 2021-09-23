@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
-import * as SecureStore from "expo-secure-store";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { retrieveToken } from "./features/auth/authSlice";
+import { retrieveToken, logout } from "./features/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
+import { Button } from "react-native";
 import Home from "./screen/Home";
 import Login from "./screen/Login";
 import SplashScreen from "./screen/SplashScreen";
@@ -20,8 +19,7 @@ export default AppContainer = () => {
   const dispatch = useDispatch();
 
   async function fetchToken() {
-    const access_token = await SecureStore.getItemAsync("access_token");
-    dispatch(retrieveToken(access_token));
+    dispatch(retrieveToken());
   }
 
   useEffect(() => {
@@ -41,7 +39,19 @@ export default AppContainer = () => {
             </>
           ) : (
             <>
-              <Stack.Screen name="Accueil" component={Home} />
+              <Stack.Screen
+                name="Accueil"
+                component={Home}
+                options={{
+                  headerRight: () => (
+                    <Button
+                      onPress={() => dispatch(logout())}
+                      title="Déconnexion"
+                      color="#000"
+                    />
+                  ),
+                }}
+              />
               {userToken == "ROLE_USER" ? (
                 <>
                   <Stack.Screen name="Planning" component={Planning} />

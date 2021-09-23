@@ -11,7 +11,9 @@ import {
 export default Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const submit = () => {
+    alert("lol");
+  };
   return (
     <View style={styles.container}>
       <View style={styles.form}>
@@ -24,6 +26,7 @@ export default Login = ({ navigation }) => {
           <Text style={styles.labelInput}>Email</Text>
           <TextInput
             style={styles.TextInput}
+            value={email}
             onChangeText={(email) => setEmail(email)}
           />
         </View>
@@ -32,10 +35,11 @@ export default Login = ({ navigation }) => {
           <TextInput
             style={styles.TextInput}
             secureTextEntry={true}
+            value={password}
             onChangeText={(password) => setPassword(password)}
           />
         </View>
-        <TouchableOpacity style={styles.loginBtn} onPress={() => alert("test")}>
+        <TouchableOpacity style={styles.loginBtn} onPress={() => submit()}>
           <Text>Connexion</Text>
         </TouchableOpacity>
       </View>

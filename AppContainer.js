@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Button } from "react-native";
+import * as SecureStore from "expo-secure-store";
+
 import Home from "./screen/Home";
 import Login from "./screen/Login";
 import SplashScreen from "./screen/SplashScreen";
@@ -14,26 +16,30 @@ import Planning from "./screen/Planning";
 const Stack = createNativeStackNavigator();
 
 export default AppContainer = () => {
-  const isLoading = useSelector((state) => state.AuthReducer.isLoading);
-  const userToken = useSelector((state) => state.AuthReducer.token);
+  const authState = useSelector((state) => state.AuthReducer);
   const dispatch = useDispatch();
 
-  async function fetchToken() {
-    dispatch(retrieveToken());
-  }
-
   useEffect(() => {
-    fetchToken();
+    async function getToken() {
+      await SecureStore.getItemAsync("access_token").then((token) =>
+        dispatch(retrieveToken(token))
+      );
+    }
+    getToken();
   }, []);
-
-  if (isLoading) {
+  async function deleteToken() {
+    await SecureStore.deleteItemAsync("access_token").then(() =>
+      dispatch(logout())
+    );
+  }
+  if (authState.isLoading) {
     return <SplashScreen />;
   }
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <Stack.Navigator>
-          {userToken == null ? (
+          {authState.token == null ? (
             <>
               <Stack.Screen name="Connexion" component={Login} />
             </>
@@ -45,14 +51,14 @@ export default AppContainer = () => {
                 options={{
                   headerRight: () => (
                     <Button
-                      onPress={() => dispatch(logout())}
+                      onPress={() => deleteToken()}
                       title="Déconnexion"
                       color="#000"
                     />
                   ),
                 }}
               />
-              {userToken == "ROLE_USER" ? (
+              {authState.role == "ROLE_USER" ? (
                 <>
                   <Stack.Screen name="Planning" component={Planning} />
                 </>

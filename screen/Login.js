@@ -10,22 +10,32 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../features/auth/authSlice";
 import axios from "axios";
+import * as SecureStore from "expo-secure-store";
 
 export default Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const submit = () => {
+    setIsLoading(true);
     axios
       .post("https://dayliz.herokuapp.com/api/auth/login", {
         email: email,
         password: password,
       })
       .then(function (response) {
-        dispatch(login(response.data.access_token));
+        async function save() {
+          await SecureStore.setItemAsync(
+            "access_token",
+            response.data.access_token
+          ).then(() => dispatch(login(response.data.access_token)));
+        }
+        save();
       })
-      .catch(function (error) {
-        alert(error);
+      .catch(function () {
+        alert("Email ou mot de passe invalide");
+        setIsLoading(false);
       });
   };
   return (
@@ -53,7 +63,11 @@ export default Login = ({ navigation }) => {
             onChangeText={(password) => setPassword(password)}
           />
         </View>
-        <TouchableOpacity style={styles.loginBtn} onPress={() => submit()}>
+        <TouchableOpacity
+          style={styles.loginBtn}
+          onPress={() => submit()}
+          disabled={isLoading}
+        >
           <Text>Connexion</Text>
         </TouchableOpacity>
       </View>

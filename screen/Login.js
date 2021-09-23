@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "../features/auth/authSlice";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import jwt_decode from "jwt-decode";
 
 export default Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -25,11 +26,21 @@ export default Login = ({ navigation }) => {
         password: password,
       })
       .then(function (response) {
+        let decoded = jwt_decode(response.data.access_token);
+        // TODO : - recuperer l'id du role,
+        //        - l'ajouter au store
         async function save() {
           await SecureStore.setItemAsync(
             "access_token",
             response.data.access_token
-          ).then(() => dispatch(login(response.data.access_token)));
+          ).then(() =>
+            dispatch(
+              login({
+                token: response.data.access_token,
+                role: //role_id
+              })
+            )
+          );
         }
         save();
       })

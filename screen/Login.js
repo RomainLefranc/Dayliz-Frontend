@@ -26,25 +26,21 @@ export default Login = ({ navigation }) => {
         password: password,
       })
       .then(function (response) {
-        let decoded = jwt_decode(response.data.access_token);
-        let role = decoded.role;
-        async function save() {
-          await SecureStore.setItemAsync(
-            "access_token",
-            response.data.access_token
-          ).then(() =>
+        const token = response.data.access_token;
+        const role = jwt_decode(token).role;
+        (async () => {
+          await SecureStore.setItemAsync("access_token", token).then(() =>
             dispatch(
               login({
-                token: response.data.access_token,
+                token: token,
                 role: role,
               })
             )
           );
-        }
-        save();
+        })();
       })
       .catch(function (error) {
-        alert(error);
+        alert(error.response.data.error);
         setIsLoading(false);
       });
   };

@@ -51,7 +51,7 @@ export default AppContainer = () => {
               save();
             })
             .catch(function (error) {
-              console.log(error);
+              alert("Impossible de se connecter pour l'instant");
             });
         } else {
           dispatch(
@@ -71,16 +71,21 @@ export default AppContainer = () => {
       // ajout du token dans le header
       axios.defaults.headers.common["Authorization"] = "bearer " + token;
       // suppression du token dans le back
-      axios.post("https://dayliz.herokuapp.com/api/auth/logout").then(() => {
-        async function removeToken() {
-          // suppression du token dans secure store
-          await SecureStore.deleteItemAsync("access_token").then(
-            // suppression du token dans le store
-            dispatch(logout())
-          );
-        }
-        removeToken();
-      });
+      axios
+        .post("https://dayliz.herokuapp.com/api/auth/logout")
+        .then(() => {
+          async function removeToken() {
+            // suppression du token dans secure store
+            await SecureStore.deleteItemAsync("access_token").then(
+              // suppression du token dans le store
+              dispatch(logout())
+            );
+          }
+          removeToken();
+        })
+        .catch((error) => {
+          alert(error);
+        });
     });
   }
   if (authState.isLoading) {

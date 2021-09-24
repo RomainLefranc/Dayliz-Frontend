@@ -20,13 +20,15 @@ export const authSlice = createSlice({
       return {
         ...state,
         token: null,
+        role: null,
         isLoading: false,
       };
     },
     retrieveToken: (state, action) => {
       return {
         ...state,
-        token: action.payload,
+        token: action.payload.token,
+        role: action.payload.role,
         isLoading: false,
       };
     },

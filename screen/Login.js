@@ -43,8 +43,8 @@ export default Login = ({ navigation }) => {
         }
         save();
       })
-      .catch(function () {
-        alert("Email ou mot de passe invalide");
+      .catch(function (error) {
+        alert(error);
         setIsLoading(false);
       });
   };

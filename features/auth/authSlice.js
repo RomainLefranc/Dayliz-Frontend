@@ -11,7 +11,8 @@ export const authSlice = createSlice({
     login: (state, action) => {
       return {
         ...state,
-        token: action.payload,
+        token: action.payload.token,
+        role: action.payload.role,
         isLoading: false,
       };
     },

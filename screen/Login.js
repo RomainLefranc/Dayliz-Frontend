@@ -27,13 +27,16 @@ export default Login = ({ navigation }) => {
       })
       .then(function (response) {
         const token = response.data.access_token;
-        const role = jwt_decode(token).role;
+        const tokenData = jwt_decode(token);
+        const role = tokenData.role;
+        const userId = tokenData.userId;
         (async () => {
           await SecureStore.setItemAsync("access_token", token).then(() =>
             dispatch(
               login({
                 token: token,
                 role: role,
+                userId: userId,
               })
             )
           );
@@ -47,11 +50,7 @@ export default Login = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.form}>
-        <Image
-          source={require("../assets/react.png")}
-          style={styles.img}
-          resizeMode="contain"
-        />
+        <Text style={styles.titre}>Dayliz</Text>
         <View style={styles.inputView}>
           <Text style={styles.labelInput}>Email</Text>
           <TextInput
@@ -74,7 +73,7 @@ export default Login = ({ navigation }) => {
           onPress={() => submit()}
           disabled={isLoading}
         >
-          <Text>Connexion</Text>
+          <Text>{isLoading ? "Chargement..." : "Connexion"}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -86,7 +85,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    alignContent: "center",
   },
   inputView: {
     width: "100%",
@@ -110,8 +108,9 @@ const styles = StyleSheet.create({
     width: "90%",
     alignItems: "flex-start",
   },
-  img: {
-    height: 250,
-    alignSelf: "center",
+  titre: {
+    fontSize: 50,
+    fontWeight: "bold",
+    width: "100%",
   },
 });

@@ -6,6 +6,7 @@ export const authSlice = createSlice({
     isLoading: true,
     token: null,
     role: null,
+    userId: null,
   },
   reducers: {
     login: (state, action) => {
@@ -14,6 +15,7 @@ export const authSlice = createSlice({
         token: action.payload.token,
         role: action.payload.role,
         isLoading: false,
+        userId: action.payload.userId,
       };
     },
     logout: (state) => {
@@ -21,6 +23,7 @@ export const authSlice = createSlice({
         ...state,
         token: null,
         role: null,
+        userId: null,
       };
     },
     retrieveToken: (state, action) => {
@@ -29,6 +32,7 @@ export const authSlice = createSlice({
         token: action.payload.token,
         role: action.payload.role,
         isLoading: false,
+        userId: action.payload.userId,
       };
     },
   },

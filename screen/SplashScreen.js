@@ -21,7 +21,9 @@ export default SplashScreen = () => {
             .post("https://dayliz.herokuapp.com/api/auth/refresh")
             .then(function (response) {
               const token = response.data.access_token;
-              const role = jwt_decode(token).role;
+              const tokenData = jwt_decode(token);
+              const role = tokenData.role;
+              const userId = tokenData.userId;
               (async () => {
                 // mis à jour du token dans secure store
                 await SecureStore.setItemAsync("access_token", token).then(() =>
@@ -30,6 +32,7 @@ export default SplashScreen = () => {
                     retrieveToken({
                       token: token,
                       role: role,
+                      userId: userId,
                     })
                   )
                 );
@@ -43,6 +46,7 @@ export default SplashScreen = () => {
             retrieveToken({
               token: null,
               role: null,
+              id: null,
             })
           );
         }

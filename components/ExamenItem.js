@@ -1,7 +1,7 @@
 import { Text } from "react-native";
 import React from "react";
 
-export default User = ({ user }) => {
+export default ExamenItem = ({ examen }) => {
   return (
     <Text
       style={{
@@ -12,7 +12,7 @@ export default User = ({ user }) => {
         padding: 10,
       }}
     >
-      {user.promotion} - {user.lastName} {user.firstName}
+      {examen.start} - {examen.end} {examen.title}
     </Text>
   );
 };

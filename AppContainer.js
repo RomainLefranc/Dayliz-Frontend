@@ -19,27 +19,33 @@ export default AppContainer = () => {
   const authState = useSelector((state) => state.AuthReducer);
   const dispatch = useDispatch();
 
-  async function deleteToken() {
-    // Récuperation du token dans secure store
-    await SecureStore.getItemAsync("access_token").then((token) => {
-      // ajout du token dans le header
-      axios.defaults.headers.common["Authorization"] = "bearer " + token;
-      // suppression du token dans le back
-      axios
-        .post("https://dayliz.herokuapp.com/api/auth/logout")
-        .then(() => {
-          (async () => {
-            // suppression du token dans secure store
-            await SecureStore.deleteItemAsync("access_token").then(
-              // suppression du token dans le store
-              dispatch(logout())
-            );
-          })();
-        })
-        .catch((error) => {
-          alert(error);
-        });
-    });
+  function deconnexion() {
+    return (
+      <Ionicons
+        name="log-out-outline"
+        size={24}
+        color="black"
+        onPress={() => deleteToken()}
+      />
+    );
+  }
+  function deleteToken() {
+    axios.defaults.headers.common["Authorization"] =
+      "bearer " + authState.token;
+    axios
+      .post("https://dayliz.herokuapp.com/api/auth/logout")
+      .then(() => {
+        (async () => {
+          // suppression du token dans secure store
+          await SecureStore.deleteItemAsync("access_token").then(
+            // suppression du token dans le store
+            dispatch(logout())
+          );
+        })();
+      })
+      .catch((error) => {
+        alert(error);
+      });
   }
 
   if (authState.isLoading) {
@@ -62,14 +68,7 @@ export default AppContainer = () => {
                     name="Planning"
                     component={Planning}
                     options={{
-                      headerRight: () => (
-                        <Ionicons
-                          name="log-out-outline"
-                          size={24}
-                          color="black"
-                          onPress={() => deleteToken()}
-                        />
-                      ),
+                      headerRight: deconnexion,
                     }}
                   />
                 </>
@@ -79,14 +78,7 @@ export default AppContainer = () => {
                     name="Examens"
                     component={Examens}
                     options={{
-                      headerRight: () => (
-                        <Ionicons
-                          name="log-out-outline"
-                          size={24}
-                          color="black"
-                          onPress={() => deleteToken()}
-                        />
-                      ),
+                      headerRight: deconnexion,
                     }}
                   />
                 </>

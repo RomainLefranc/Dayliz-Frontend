@@ -6,12 +6,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SecureStore from "expo-secure-store";
 import { Ionicons } from "@expo/vector-icons";
-import axios from "axios";
 
-import Login from "./screen/Login";
+import LoginScreen from "./screen/LoginScreen";
 import SplashScreen from "./screen/SplashScreen";
-import Examens from "./screen/Examens";
-import Planning from "./screen/Planning";
+import ExaminateurHomeScreen from "./screen/ExaminateurHomeScreen";
+import ApprenantHomeScreen from "./screen/ApprenantHomeScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,22 +29,13 @@ export default AppContainer = () => {
     );
   }
   function deleteToken() {
-    axios.defaults.headers.common["Authorization"] =
-      "bearer " + authState.token;
-    axios
-      .post("https://dayliz.herokuapp.com/api/auth/logout")
-      .then(() => {
-        (async () => {
-          // suppression du token dans secure store
-          await SecureStore.deleteItemAsync("access_token").then(
-            // suppression du token dans le store
-            dispatch(logout())
-          );
-        })();
-      })
-      .catch((error) => {
-        alert(error);
-      });
+    (async () => {
+      // suppression du token dans secure store
+      await SecureStore.deleteItemAsync("access_token").then(
+        // suppression du token dans le store
+        dispatch(logout())
+      );
+    })();
   }
 
   if (authState.isLoading) {
@@ -58,15 +48,15 @@ export default AppContainer = () => {
         <Stack.Navigator>
           {authState.token == null ? (
             <>
-              <Stack.Screen name="Connexion" component={Login} />
+              <Stack.Screen name="Connexion" component={LoginScreen} />
             </>
           ) : (
             <>
               {authState.role == 2 ? (
                 <>
                   <Stack.Screen
-                    name="Planning"
-                    component={Planning}
+                    name="Planning d'aujourd'hui"
+                    component={ApprenantHomeScreen}
                     options={{
                       headerRight: deconnexion,
                     }}
@@ -76,7 +66,7 @@ export default AppContainer = () => {
                 <>
                   <Stack.Screen
                     name="Examens"
-                    component={Examens}
+                    component={ExaminateurHomeScreen}
                     options={{
                       headerRight: deconnexion,
                     }}

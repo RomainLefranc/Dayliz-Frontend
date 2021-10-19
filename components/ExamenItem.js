@@ -1,18 +1,25 @@
-import { Text } from "react-native";
+import { Button, Pressable, Text } from "react-native";
 import React from "react";
 
-export default ExamenItem = ({ examen }) => {
+export default ExamenItem = ({ examen, navigation }) => {
   return (
-    <Text
+    <Pressable
       style={{
-        backgroundColor: "#E0E0E0",
-        marginTop: 5,
-        marginBottom: 5,
-        borderRadius: 10,
-        padding: 10,
+        backgroundColor: "#03A9F4",
+        borderRadius: 20,
+        height: 100,
+        margin: 10,
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      onPress={() => {
+        navigation.navigate("Vos activités", {
+          examenId: examen.id,
+        });
       }}
     >
-      {examen.start} - {examen.end} {examen.title}
-    </Text>
+      <Text>{examen.title}</Text>
+    </Pressable>
   );
 };

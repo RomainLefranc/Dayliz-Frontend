@@ -13,10 +13,22 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import jwt_decode from "jwt-decode";
 
-export default Login = ({ navigation }) => {
+export default LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const validation = {
+    error: false,
+    email: {
+      error: false,
+      message: "",
+    },
+    password: {
+      error: false,
+      password: "",
+    },
+  };
   const dispatch = useDispatch();
   const submit = () => {
     setIsLoading(true);
@@ -56,8 +68,14 @@ export default Login = ({ navigation }) => {
           <TextInput
             style={styles.TextInput}
             value={email}
+            autoCapitalize="none"
             onChangeText={(email) => setEmail(email)}
           />
+          {validation.email == true ? (
+            <Text style={{ color: "#B71C1C" }}>{validation.email.message}</Text>
+          ) : (
+            <></>
+          )}
         </View>
         <View style={styles.inputView}>
           <Text style={styles.labelInput}>Mot de passe</Text>
@@ -67,6 +85,13 @@ export default Login = ({ navigation }) => {
             value={password}
             onChangeText={(password) => setPassword(password)}
           />
+          {validation.password == true ? (
+            <Text style={{ color: "#B71C1C" }}>
+              {validation.password.message}
+            </Text>
+          ) : (
+            <></>
+          )}
         </View>
         <TouchableOpacity
           style={styles.loginBtn}

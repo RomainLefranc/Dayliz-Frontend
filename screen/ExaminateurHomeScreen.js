@@ -1,11 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import ExamenItem from "../components/ExamenItem";
-import Loading from "../components/Loading";
 import axios from "axios";
 
-export default Planning = () => {
+export default ExaminateurHomeScreen = () => {
   const [examens, setExamens] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const authState = useSelector((state) => state.AuthReducer);
@@ -14,28 +13,27 @@ export default Planning = () => {
     axios.defaults.headers.common["Authorization"] =
       "bearer " + authState.token;
     axios
-      .post(
-        `https://dayliz.herokuapp.com/api/users/${authState.userId}/examens`
-      )
+      .get(`https://dayliz.herokuapp.com/api/examens`)
       .then(function (response) {
-        setExamens(response.data.examens);
+        setExamens(response.data);
         setIsLoading(false);
       })
       .catch(function (error) {
         setIsLoading(false);
-        alert(error.data);
+        alert(error);
       });
   }, []);
 
   return (
     <View style={styles.container}>
       {isLoading ? (
-        <Loading />
-      ) : examens ? (
+        <ActivityIndicator size="large" color="#81D4FA" />
+      ) : examens.length != 0 ? (
         <FlatList
+          style={{ width: "100%" }}
           data={examens}
           renderItem={(examen) => <ExamenItem examen={examen.item} />}
-          keyExtractor={(examen) => examen.id}
+          keyExtractor={(examen) => examen.id.toString()}
         />
       ) : (
         <Text>Aucuns examens</Text>
@@ -47,7 +45,7 @@ export default Planning = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
   },
 });

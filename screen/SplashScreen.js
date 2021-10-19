@@ -39,7 +39,13 @@ export default SplashScreen = () => {
               })();
             })
             .catch(function (error) {
-              alert(error);
+              dispatch(
+                retrieveToken({
+                  token: null,
+                  role: null,
+                  id: null,
+                })
+              );
             });
         } else {
           dispatch(

@@ -11,6 +11,7 @@ import LoginScreen from "./screen/LoginScreen";
 import SplashScreen from "./screen/SplashScreen";
 import ExaminateurHomeScreen from "./screen/ExaminateurHomeScreen";
 import ApprenantHomeScreen from "./screen/ApprenantHomeScreen";
+import ActiviteExamenScreen from "./screen/ActiviteExamenScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -67,6 +68,13 @@ export default AppContainer = () => {
                   <Stack.Screen
                     name="Examens"
                     component={ExaminateurHomeScreen}
+                    options={{
+                      headerRight: deconnexion,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="Activites"
+                    component={ActiviteExamenScreen}
                     options={{
                       headerRight: deconnexion,
                     }}

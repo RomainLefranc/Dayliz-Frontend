@@ -3,18 +3,12 @@ import { StyleSheet, Text, View } from "react-native";
 
 const ActiviteItem = ({ activite }) => {
   return (
-    <View
-      style={{
-        backgroundColor: "#B3E5FC",
-        borderRadius: 20,
-        margin: 10,
-        padding: 10,
-      }}
-    >
-      <View style={{ alignItems: "center", marginBottom: 10 }}>
-        <Text style={{ color: "#212121" }}>{activite.title}</Text>
+    <View className="bg-black rounded-md mb-2 p-2">
+      <View className="mb-2">
+        <Text className="text-white">{activite.title}</Text>
       </View>
       <View
+        className="flex-1 "
         style={{
           flex: 1,
           backgroundColor: "#E1F5FE",
@@ -33,9 +27,7 @@ const ActiviteItem = ({ activite }) => {
           padding: 10,
         }}
       >
-        <Text style={{ color: "#212121" }}>
-          {activite.duree / 60 / 60 + " min"}
-        </Text>
+        <Text style={{ color: "#212121" }}>{activite.duree / 60 + " min"}</Text>
       </View>
     </View>
   );

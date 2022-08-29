@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
-  Image,
-  StyleSheet,
+  ActivityIndicator,
   Text,
   TextInput,
   TouchableOpacity,
@@ -13,129 +12,85 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import jwt_decode from "jwt-decode";
 
-export default LoginScreen = ({ navigation }) => {
+export default LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState(null);
 
-  const validation = {
-    error: false,
-    email: {
-      error: false,
-      message: "",
-    },
-    password: {
-      error: false,
-      password: "",
-    },
-  };
   const dispatch = useDispatch();
   const submit = () => {
     setIsLoading(true);
+    setErrors(null);
     axios
       .post("https://dayliz.herokuapp.com/api/auth/login", {
         email: email,
         password: password,
       })
-      .then(function (response) {
+      .then(async (response) => {
         const token = response.data.access_token;
         const tokenData = jwt_decode(token);
         const role = tokenData.role;
         const userId = tokenData.userId;
-        (async () => {
-          await SecureStore.setItemAsync("access_token", token).then(() =>
-            dispatch(
-              login({
-                token: token,
-                role: role,
-                userId: userId,
-              })
-            )
-          );
-        })();
+        await SecureStore.setItemAsync("access_token", token).then(() =>
+          dispatch(
+            login({
+              token: token,
+              role: role,
+              userId: userId,
+            })
+          )
+        );
       })
       .catch(function (error) {
-        alert(error.response.data.error);
         setIsLoading(false);
+
+        if (error.response.data.error == "Unauthorized") {
+          setErrors("Mot de passe ou adresse email invalide");
+          return;
+        }
+
+        setErrors(error.response.data.error);
       });
   };
   return (
-    <View style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.titre}>Dayliz</Text>
-        <View style={styles.inputView}>
-          <Text style={styles.labelInput}>Email</Text>
+    <View className="flex-1 justify-center bg-white">
+      <View className="px-4">
+        <Text className="text-5xl mb-9">Dayliz</Text>
+        <View className="w-full mb-3">
+          <Text className="mb-2">Email</Text>
           <TextInput
-            style={styles.TextInput}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             value={email}
             autoCapitalize="none"
             onChangeText={(email) => setEmail(email)}
           />
-          {validation.email == true ? (
-            <Text style={{ color: "#B71C1C" }}>{validation.email.message}</Text>
-          ) : (
-            <></>
-          )}
         </View>
-        <View style={styles.inputView}>
-          <Text style={styles.labelInput}>Mot de passe</Text>
+        <View className="w-full mb-3">
+          <Text className="mb-2">Mot de passe</Text>
           <TextInput
-            style={styles.TextInput}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             secureTextEntry={true}
             value={password}
             onChangeText={(password) => setPassword(password)}
           />
-          {validation.password == true ? (
-            <Text style={{ color: "#B71C1C" }}>
-              {validation.password.message}
-            </Text>
-          ) : (
-            <></>
-          )}
         </View>
         <TouchableOpacity
-          style={styles.loginBtn}
+          className="bg-gray-800 w-32 flex-1 items-center hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5  mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
           onPress={() => submit()}
-          disabled={isLoading}
+          disabled={isLoading || email == "" || password == ""}
         >
-          <Text>{isLoading ? "Chargement..." : "Connexion"}</Text>
+          <Text className="text-white">
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#FFF" />
+            ) : (
+              "Connexion"
+            )}
+          </Text>
         </TouchableOpacity>
+
+        {errors && <Text className="text-red-600 text-xs">{errors}</Text>}
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  inputView: {
-    width: "100%",
-    marginBottom: 20,
-  },
-  TextInput: {
-    paddingLeft: 10,
-    height: 45,
-    backgroundColor: "#c9c9c9",
-    borderRadius: 10,
-  },
-  labelInput: { marginBottom: 5 },
-  loginBtn: {
-    borderRadius: 10,
-    height: 40,
-    justifyContent: "center",
-    backgroundColor: "#03A9F4",
-    padding: 10,
-  },
-  form: {
-    width: "90%",
-    alignItems: "flex-start",
-  },
-  titre: {
-    fontSize: 50,
-    fontWeight: "bold",
-    width: "100%",
-  },
-});

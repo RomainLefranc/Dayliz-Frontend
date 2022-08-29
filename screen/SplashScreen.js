@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import { ActivityIndicator, Image, StyleSheet, View } from "react-native";
-import jwt_decode from "jwt-decode";
+import { ActivityIndicator, Image, View } from "react-native";
 import { retrieveToken } from "../features/auth/authSlice";
 import { useDispatch } from "react-redux";
 import * as SecureStore from "expo-secure-store";
@@ -9,61 +8,55 @@ import axios from "axios";
 export default SplashScreen = () => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    (async () => {
-      // Récuperation du token dans secure store
-      await SecureStore.getItemAsync("access_token").then((token) => {
-        if (token != null) {
-          // ajout du token dans le header
-          axios.defaults.headers.common["Authorization"] = "bearer " + token;
-          // mis à jour du token dans le back
-          axios
-            .post("https://dayliz.herokuapp.com/api/auth/refresh")
-            .then(function (response) {
-              const token = response.data.access_token;
-              const tokenData = jwt_decode(token);
-              const role = tokenData.role;
-              const userId = tokenData.userId;
-              (async () => {
-                // mis à jour du token dans secure store
-                await SecureStore.setItemAsync("access_token", token).then(() =>
-                  dispatch(
-                    // mis à jour du token dans le store
-                    retrieveToken({
-                      token: token,
-                      role: role,
-                      userId: userId,
-                    })
-                  )
-                );
-              })();
-            })
-            .catch(function (error) {
-              dispatch(
-                retrieveToken({
-                  token: null,
-                  role: null,
-                  id: null,
-                })
-              );
-            });
-        } else {
-          dispatch(
-            retrieveToken({
-              token: null,
-              role: null,
-              id: null,
-            })
-          );
-        }
+  useEffect(async () => {
+    const token = await SecureStore.getItemAsync("access_token");
+
+    if (token == null) {
+      dispatch(
+        retrieveToken({
+          token: null,
+          role: null,
+          id: null,
+        })
+      );
+      return;
+    }
+
+    // ajout du token dans le header
+    axios.defaults.headers.common["Authorization"] = "bearer " + token;
+
+    // récuperation des données utilisateur avec le token
+    const response = await axios
+      .post("https://dayliz.herokuapp.com/api/auth/me")
+      .catch(function (error) {
+        dispatch(
+          retrieveToken({
+            token: null,
+            role: null,
+            id: null,
+          })
+        );
+        return;
       });
-    })();
+
+    const role = response.data.user.role_id;
+    const userId = response.data.user.id;
+    await SecureStore.setItemAsync("access_token", token);
+    dispatch(
+      // mis à jour du token dans le store
+      retrieveToken({
+        token: token,
+        role: role,
+        userId: userId,
+      })
+    );
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 items-center justify-center bg-white">
       <Image
         source={require("../assets/react.png")}
+        className="h-60 self-center"
         style={styles.img}
         resizeMode="contain"
       />
@@ -71,16 +64,3 @@ export default SplashScreen = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#ffffff",
-  },
-  img: {
-    height: 250,
-    alignSelf: "center",
-  },
-});
